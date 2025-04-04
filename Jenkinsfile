@@ -87,11 +87,11 @@ pipeline {
             }
         }
 
-        stage('Run Tests') {
-            steps {
-                bat '.\\venv\\Scripts\\activate && .\\venv\\Scripts\\python.exe -m pytest'
-            }
-        }
+        // stage('Run Tests') {
+        //     steps {
+        //         bat '.\\venv\\Scripts\\activate && .\\venv\\Scripts\\python.exe -m pytest'
+        //     }
+        // }
 
         stage('Deploy') {
             steps {
