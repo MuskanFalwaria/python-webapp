@@ -51,5 +51,5 @@ pipeline {
         success {
             echo 'Deployment Successful!'
         }
-    }
+    }
 }
