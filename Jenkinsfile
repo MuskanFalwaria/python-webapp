@@ -16,7 +16,7 @@ pipeline {
         }
         stage('Publish') {
             steps {
-                bat 'powershell -Command "Compress-Archive -Path * -DestinationPath app.zip"'
+                bat 'powershell -Command "Compress-Archive -Path * -DestinationPath app.zip -Force"'
             }
         }
         stage('Deploy to Azure') {
