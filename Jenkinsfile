@@ -20,7 +20,7 @@ pipeline {
                                                        clientSecretVariable: 'AZURE_CLIENT_SECRET',
                                                        tenantIdVariable: 'AZURE_TENANT_ID')]) {
 
-                    sh '''
+                    bat '''
                         echo Logging into Azure...
                         az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
                         az account set --subscription $AZURE_SUBSCRIPTION_ID
@@ -32,7 +32,7 @@ pipeline {
 
         stage('Run Application Script') {
             steps {
-                sh '''
+                bat '''
                     echo "Running your app logic here..."
                     # Add your deployment or testing script here
                 '''
