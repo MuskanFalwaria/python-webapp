@@ -4,7 +4,8 @@ pipeline {
     environment {
         AZURE_CREDENTIALS_ID = 'azure-service-principal'
         RESOURCE_GROUP = 'rg-jenkins'
-        APP_SERVICE_NAME = 'webapijenkinsnaitik457'
+        APP_SERVICE_NAME = 'webapijenkinsmuskan982823
+'
     }
 
     stages {
@@ -16,14 +17,18 @@ pipeline {
 
         stage('Set Up Python Environment') {
             steps {
-                bat '"C:\\Users\\ASUS\\AppData\\Local\\Programs\\Python\\Python313\\python.exe" -m venv venv'
+                bat '"C:\\Users\\HP\\AppData\\Local\\Programs\\Python\\Python39\\python.exe" -m venv venv'
                 bat '.\\venv\\Scripts\\activate && .\\venv\\Scripts\\python.exe -m pip install --upgrade pip'
                 bat '.\\venv\\Scripts\\activate && .\\venv\\Scripts\\python.exe -m pip install -r requirements.txt'
                 bat '.\\venv\\Scripts\\activate && .\\venv\\Scripts\\python.exe -m pip install pytest'
             }
         }
 
-        
+        // stage('Run Tests') {
+        //     steps {
+        //         bat '.\\venv\\Scripts\\activate && .\\venv\\Scripts\\python.exe -m pytest'
+        //     }
+        // }
 
         stage('Deploy') {
             steps {
@@ -53,3 +58,5 @@ pipeline {
         }
     }
 }
+
+
