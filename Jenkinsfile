@@ -11,12 +11,12 @@ pipeline {
         }
         stage('Build') {
             steps {
-                bat 'echo Hello from WIndows'
+                bat 'echo Hello from Windows'
             }
         }
         stage('Publish') {
             steps {
-                sh 'zip -r app.zip .'
+                bat 'powershell -Command "Compress-Archive -Path * -DestinationPath app.zip"'
             }
         }
         stage('Deploy to Azure') {
