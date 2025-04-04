@@ -6,34 +6,49 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/MuskanFalwaria/python-webapp.git'
+                git branch: 'main', url: 'https://github.com/samriddhagarwal07/pythonwebapi.git'
             }
         }
         stage('Build') {
             steps {
-                bat 'echo Hello from Windows'
-            }
-        }
-        stage('Publish') {
-            steps {
-                bat 'powershell -Command "Compress-Archive -Path * -DestinationPath app.zip -Force"'
-            }
-        }
-
-                stage('Deploy to Azure') {
-            steps {
-                withCredentials([
-                    string(credentialsId: 'azure-client-id', variable: 'AZURE_CLIENT_ID'),
-                    string(credentialsId: 'azure-client-secret', variable: 'AZURE_CLIENT_SECRET'),
-                    string(credentialsId: 'azure-tenant-id', variable: 'AZURE_TENANT_ID')
-                ]) {
-                    bat """
-                    az login --service-principal -u "%AZURE_CLIENT_ID%" -p "%AZURE_CLIENT_SECRET%" --tenant "%AZURE_TENANT_ID%"
-                    az webapp up --name myPythonApp --resource-group myResourceGroup --runtime "PYTHON:3.9" --src-path .
-                    """
+                script {
+                    if (isUnix()) {
+                        // Run shell commands if on a Unix-based system (Linux/macOS)
+                        sh 'echo "Building the project on a Unix system"'
+                    } else {
+                        // Run batch commands if on Windows
+                        bat 'echo "Building the project on a Windows system"'
+                    }
                 }
             }
         }
 
+        stage('Publish') {
+            steps {
+                script {
+                    if (isUnix()) {
+                        // Example Unix command
+                        sh 'echo "Publishing on Unix"'
+                    } else {
+                        // Example Windows command
+                        bat 'echo "Publishing on Windows"'
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to Azure') {
+            steps {
+                script {
+                    if (isUnix()) {
+                        // Example Unix command for deployment
+                        sh 'echo "Deploying to Azure from Unix"'
+                    } else {
+                        // Example Windows command for deployment
+                        bat 'echo "Deploying to Azure from Windows"'
+                    }
+                }
+            }
+        }
     }
 }
