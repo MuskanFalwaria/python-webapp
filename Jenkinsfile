@@ -29,24 +29,48 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
-            steps {
-                withCredentials([azureServicePrincipal(credentialsId: AZURE_CREDENTIALS_ID)]) {
-                    bat '''
-                    if exist publish (rmdir /s /q publish)
-                    mkdir publish
+    //     stage('Deploy') {
+    //         steps {
+    //             withCredentials([azureServicePrincipal(credentialsId: AZURE_CREDENTIALS_ID)]) {
+    //                 bat '''
+    //                 if exist publish (rmdir /s /q publish)
+    //                 mkdir publish
 
-                    :: Copy .py files and requirements.txt to publish folder
-                    for %%f in (*.py) do copy "%%f" publish\\
-                    if exist requirements.txt copy requirements.txt publish\\
-                    '''
-                    bat 'az login --service-principal -u %AZURE_CLIENT_ID% -p %AZURE_CLIENT_SECRET% --tenant %AZURE_TENANT_ID%'
-                    bat 'powershell Compress-Archive -Path ./publish/* -DestinationPath ./publish.zip -Force'
-                    bat 'az webapp deploy --resource-group %RESOURCE_GROUP% --name %APP_SERVICE_NAME% --src-path ./publish.zip --type zip'
-                }
-            }
+    //                 :: Copy .py files and requirements.txt to publish folder
+    //                 for %%f in (*.py) do copy "%%f" publish\\
+    //                 if exist requirements.txt copy requirements.txt publish\\
+    //                 '''
+    //                 bat 'az login --service-principal -u %AZURE_CLIENT_ID% -p %AZURE_CLIENT_SECRET% --tenant %AZURE_TENANT_ID%'
+    //                 bat 'powershell Compress-Archive -Path ./publish/* -DestinationPath ./publish.zip -Force'
+    //                 bat 'az webapp deploy --resource-group %RESOURCE_GROUP% --name %APP_SERVICE_NAME% --src-path ./publish.zip --type zip'
+    //             }
+    //         }
+    //     }
+    // }
+        stage('Deploy') {
+    steps {
+        withCredentials([azureServicePrincipal(credentialsId: AZURE_CREDENTIALS_ID)]) {
+            bat '''
+            if exist publish (rmdir /s /q publish)
+            mkdir publish
+
+            :: Copy main application files and requirements.txt to publish folder
+            for %%f in (*.py) do (
+                echo %%f | findstr /i /v "test_" > nul
+                if errorlevel 1 (
+                    copy "%%f" publish\\
+                )
+            )
+
+            if exist requirements.txt copy requirements.txt publish\\
+            '''
+            bat 'az login --service-principal -u %AZURE_CLIENT_ID% -p %AZURE_CLIENT_SECRET% --tenant %AZURE_TENANT_ID%'
+            bat 'powershell Compress-Archive -Path ./publish/* -DestinationPath ./publish.zip -Force'
+            bat 'az webapp deploy --resource-group %RESOURCE_GROUP% --name %APP_SERVICE_NAME% --src-path ./publish.zip --type zip'
         }
     }
+}
+
 
     post {
         failure {
