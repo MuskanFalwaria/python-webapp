@@ -1,54 +1,48 @@
 pipeline {
     agent any
+
     environment {
-        AZURE_CREDENTIALS = credentials('azure-service-principal')
+        AZURE_CREDENTIALS_ID = 'azure-service-principal'
+        RESOURCE_GROUP = 'rg-jenkins'
+        APP_SERVICE_NAME = 'pythonwebapp982823'
     }
+
     stages {
-        stage('Checkout') {
+        stage('Checkout Code') {
             steps {
                 git branch: 'main', url: 'https://github.com/MuskanFalwaria/python-webapp.git'
             }
         }
+
         stage('Build') {
             steps {
-                script {
-                    if (isUnix()) {
-                        // Run shell commands if on a Unix-based system (Linux/macOS)
-                        sh 'echo "Building the project on a Unix system"'
-                    } else {
-                        // Run batch commands if on Windows
-                        bat 'echo "Building the project on a Windows system"'
-                    }
-                }
+                bat 'python -m venv venv'
+                bat '.\\venv\\Scripts\\activate && pip install -r requirements.txt'
             }
         }
 
-        stage('Publish') {
+        stage('Package') {
             steps {
-                script {
-                    if (isUnix()) {
-                        // Example Unix command
-                        sh 'echo "Publishing on Unix"'
-                    } else {
-                        // Example Windows command
-                        bat 'echo "Publishing on Windows"'
-                    }
-                }
+                bat 'powershell -Command "Compress-Archive -Path * -DestinationPath app.zip -Force"'
             }
         }
 
-        stage('Deploy to Azure') {
+        stage('Deploy') {
             steps {
-                script {
-                    if (isUnix()) {
-                        // Example Unix command for deployment
-                        sh 'echo "Deploying to Azure from Unix"'
-                    } else {
-                        // Example Windows command for deployment
-                        bat 'echo "Deploying to Azure from Windows"'
-                    }
+                withCredentials([azureServicePrincipal(credentialsId: AZURE_CREDENTIALS_ID)]) {
+                    bat 'az login --service-principal -u %AZURE_CLIENT_ID% -p %AZURE_CLIENT_SECRET% --tenant %AZURE_TENANT_ID%'
+                    bat 'az webapp deploy --resource-group %RESOURCE_GROUP% --name %APP_SERVICE_NAME% --src-path app.zip --type zip'
                 }
             }
+        }
+    }
+
+    post {
+        success {
+            echo 'Python Web App Deployed Successfully!'
+        }
+        failure {
+            echo 'Deployment Failed!'
         }
     }
 }
