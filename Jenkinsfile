@@ -4,8 +4,7 @@ pipeline {
     environment {
         AZURE_CREDENTIALS_ID = 'azure-service-principal'
         RESOURCE_GROUP = 'rg-jenkins'
-        APP_SERVICE_NAME = 'webapijenkinsmuskan982823
-'
+        APP_SERVICE_NAME = 'webapijenkinsmuskan982823'
     }
 
     stages {
