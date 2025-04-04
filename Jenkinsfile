@@ -6,7 +6,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/MuskanFalwaria/python-webapp.git'
+                git branch: 'main' , url:  'https://github.com/MuskanFalwaria/python-webapp.git'
             }
         }
         stage('Build') {
