@@ -14,11 +14,12 @@ pipeline {
 
         stage('Azure Login') {
             steps {
-                withCredentials([azureServicePrincipal(credentialsId: "${AZURE_CREDENTIALS_ID}",
-                                                      subscriptionIdVariable: 'AZURE_SUBSCRIPTION_ID',
-                                                      clientIdVariable: 'AZURE_CLIENT_ID',
-                                                      clientSecretVariable: 'AZURE_CLIENT_SECRET',
-                                                      tenantIdVariable: 'AZURE_TENANT_ID')]) {
+                withCredentials([azureServicePrincipal(credentialsId: 'azure-service-principal',
+                                                       subscriptionIdVariable: 'AZURE_SUBSCRIPTION_ID',
+                                                       clientIdVariable: 'AZURE_CLIENT_ID',
+                                                       clientSecretVariable: 'AZURE_CLIENT_SECRET',
+                                                       tenantIdVariable: 'AZURE_TENANT_ID')]) {
+
                     sh '''
                         echo Logging into Azure...
                         az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
