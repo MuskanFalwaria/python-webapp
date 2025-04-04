@@ -11,7 +11,7 @@ pipeline {
         }
         stage('Build') {
             steps {
-                bat 'pip install -r requirements.txt'
+                bat 'echo Hello from Windows'
             }
         }
         stage('Publish') {
