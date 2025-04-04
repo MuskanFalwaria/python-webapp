@@ -20,14 +20,23 @@ pipeline {
             }
         }
         stage('Deploy to Azure') {
-            steps {
-                withCredentials([azureServicePrincipal('azure-service-principal')]) {
-                    bat '''
-                        az login --service-principal -u %AZURE_CREDENTIALS_USR% -p %AZURE_CREDENTIALS_PSW% --tenant %AZURE_CREDENTIALS_TEN%
-                        az webapp up --name myPythonApp --resource-group myResourceGroup --runtime "PYTHON:3.9" --src-path .
-                    '''
-                }
-            }
+    steps {
+        withCredentials([
+            string(credentialsId: 'AZURE_CLIENT_ID', variable: 'AZURE_CLIENT_ID'),
+            string(credentialsId: 'AZURE_CLIENT_SECRET', variable: 'AZURE_CLIENT_SECRET'),
+            string(credentialsId: 'AZURE_TENANT_ID', variable: 'AZURE_TENANT_ID'),
+            string(credentialsId: 'AZURE_SUBSCRIPTION_ID', variable: 'AZURE_SUBSCRIPTION_ID')
+        ]) {
+            bat """
+                echo Logging into Azure...
+                az login --service-principal -u %AZURE_CLIENT_ID% -p %AZURE_CLIENT_SECRET% --tenant %AZURE_TENANT_ID%
+                echo Setting subscription...
+                az account set --subscription %AZURE_SUBSCRIPTION_ID%
+                echo Deployment script would go here.
+            """
         }
+    }
+}
+
     }
 }
