@@ -1,48 +1,38 @@
 pipeline {
     agent any
-
     environment {
-        AZURE_CREDENTIALS_ID = 'azure-service-principal' // Replace with your actual credentials ID in Jenkins
+        AZURE_CREDENTIALS = credentials('azure-service-principal')
     }
-
     stages {
-        stage('Checkout Code') {
+        stage('Checkout') {
             steps {
-                git url: 'https://github.com/MuskanFalwaria/python-webapp.git', branch: 'main'
+                git branch: 'main', url: 'https://github.com/MuskanFalwaria/python-webapp.git'
             }
         }
-
-        stage('Azure Login') {
+        stage('Build') {
             steps {
-                withCredentials([azureServicePrincipal(credentialsId: 'azure-service-principal',
-                                                       subscriptionIdVariable: 'AZURE_SUBSCRIPTION_ID',
-                                                       clientIdVariable: 'AZURE_CLIENT_ID',
-                                                       clientSecretVariable: 'AZURE_CLIENT_SECRET',
-                                                       tenantIdVariable: 'AZURE_TENANT_ID')]) {
-
-                    bat '''
-                        echo Logging into Azure...
-                        az login --service-principal -u %AZURE_CLIENT_ID% -p %AZURE_CLIENT_SECRET% --tenant %AZURE_TENANT_ID%
-                        az account set --subscription %AZURE_SUBSCRIPTION_ID%
-                        echo Azure login successful
-                    '''
+                bat 'pip install -r requirements.txt'
+            }
+        }
+        stage('Publish') {
+            steps {
+                 bat 'tar -cvf app.tar .'
+            }
+        }
+                stage('Deploy to Azure') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'azure-client-id', variable: 'AZURE_CLIENT_ID'),
+                    string(credentialsId: 'azure-client-secret', variable: 'AZURE_CLIENT_SECRET'),
+                    string(credentialsId: 'azure-tenant-id', variable: 'AZURE_TENANT_ID')
+                ]) {
+                    bat """
+                    az login --service-principal -u "%AZURE_CLIENT_ID%" -p "%AZURE_CLIENT_SECRET%" --tenant "%AZURE_TENANT_ID%"
+                    az webapp up --name myPythonApp --resource-group myResourceGroup --runtime "PYTHON:3.9" --src-path .
+                    """
                 }
             }
         }
 
-        stage('Run Application Script') {
-            steps {
-                bat '''
-                    echo Running your app logic here...
-                    REM Add your deployment or testing script here
-                '''
-            }
-        }
-    }
-
-    post {
-        always {
-            echo 'Pipeline completed.'
-        }
     }
 }
