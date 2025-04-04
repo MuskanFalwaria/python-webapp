@@ -16,10 +16,11 @@ pipeline {
 
         stage('Build') {
             steps {
-                bat 'python -m venv venv'
+                bat 'C:\\Python311\\python.exe -m venv venv
                 bat '.\\venv\\Scripts\\activate && pip install -r requirements.txt'
             }
         }
+
 
         stage('Package') {
             steps {
