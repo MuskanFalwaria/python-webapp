@@ -102,7 +102,8 @@ pipeline {
 
                     :: Copy non-test .py files and requirements.txt
                     for %%f in (*.py) do (
-                        echo %%f | findstr /i /v "test_" > nul
+                        // echo %%f | findstr /i /v "test_" > nul
+                        echo %%~nxf | findstr /R "^test_" >nul
                         if errorlevel 1 (
                             copy "%%f" publish\\
                         )
